@@ -1,0 +1,89 @@
+<main
+  class="pokedex-container"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="onPointerUp($event)"
+>
+  <section class="card" *ngIf="pokemon() as p">
+    <header class="card-header">
+      <span class="pokemon-id">#{{ p.id | number: '3.0' }}</span>
+      <h1 class="pokemon-name">{{ displayName() }}</h1>
+    </header>
+
+    <div class="card-body">
+      <div class="sprite-wrapper">
+        <img
+          *ngIf="p.sprites.front_default; else noImage"
+          [src]="p.sprites.front_default!"
+          [alt]="p.name"
+        />
+        <ng-template #noImage>
+          <div class="no-image">No image</div>
+        </ng-template>
+      </div>
+
+      <div class="info">
+        <div class="types">
+          <span
+            class="type-pill"
+            *ngFor="let t of p.types"
+            [ngClass]="'type-' + t.type.name"
+          >
+            {{ t.type.name }}
+          </span>
+        </div>
+
+        <div class="metrics">
+          <div>Height: {{ p.height / 10 | number: '1.1-1' }} m</div>
+          <div>Weight: {{ p.weight / 10 | number: '1.1-1' }} kg</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-row" *ngFor="let s of p.stats">
+            <span class="stat-name">{{ s.stat.name }}</span>
+            <div class="stat-bar">
+              <div
+                class="stat-bar-fill"
+                [style.width.%]="(s.base_stat / 150) * 100"
+              ></div>
+            </div>
+            <span class="stat-value">{{ s.base_stat }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card placeholder" *ngIf="!pokemon() && !loading() && !error()">
+    <p>Use the controls below to start browsing the Pokédex.</p>
+  </section>
+
+  <div class="status error" *ngIf="error() as err">
+    {{ err }}
+    <button type="button" (click)="loadPokemon(currentId())">Retry</button>
+  </div>
+
+  <footer class="controls">
+    <button
+      type="button"
+      class="nav-button"
+      (click)="previous()"
+      [disabled]="isPreviousDisabled()"
+    >
+      << Previous
+    </button>
+
+    <div class="current-range">
+      #{{ currentId() }} / {{ maxId }}
+    </div>
+
+    <button
+      type="button"
+      class="nav-button"
+      (click)="next()"
+      [disabled]="isNextDisabled()"
+    >
+      Next >>
+    </button>
+  </footer>
+</main>
+
